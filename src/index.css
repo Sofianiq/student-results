@@ -1,0 +1,388 @@
+@import 'tailwindcss';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-400.css';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-500.css';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-600.css';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-700.css';
+@import '@fontsource/ibm-plex-sans-arabic/latin-400.css';
+@import '@fontsource/ibm-plex-sans-arabic/latin-600.css';
+@import '@fontsource/ibm-plex-sans-arabic/latin-700.css';
+@import '@fontsource/amiri/arabic-400.css';
+@import '@fontsource/amiri/arabic-700.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ===== الهوية: كحلي أكاديمي + ذهبي الشعار على خلفية عاجية ===== */
+:root {
+  --bg: #f6f3ec;
+  --surface: #ffffff;
+  --surface-2: #f1ede3;
+  --line: #e4ddcc;
+  --line-strong: #d2c8b0;
+  --ink: #16213a;
+  --muted: #5b6478;
+  --faint: #8e95a5;
+
+  --navy: #14284b;
+  --navy-2: #1d3a6b;
+  --navy-soft: #e8edf6;
+  --navy-text: #14284b;
+
+  --gold: #b8913a;
+  --gold-2: #d9b866;
+  --gold-soft: #f7efdb;
+  --gold-text: #7d5f1c;
+
+  --ok: #1f6b47;
+  --ok-soft: #e6f3ec;
+  --warn: #99610a;
+  --warn-soft: #fbf0d9;
+  --bad: #a3271f;
+  --bad-soft: #fbe9e7;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0b1322;
+  --surface: #121c30;
+  --surface-2: #18243c;
+  --line: #24324f;
+  --line-strong: #33456b;
+  --ink: #eef1f7;
+  --muted: #a6b0c5;
+  --faint: #76819a;
+
+  --navy: #0f1d38;
+  --navy-2: #1a315c;
+  --navy-soft: #1b2a47;
+  --navy-text: #c9d6f2;
+
+  --gold: #d2ae5c;
+  --gold-2: #e6c97f;
+  --gold-soft: #2b2617;
+  --gold-text: #e3c57a;
+
+  --ok: #58c391;
+  --ok-soft: #12291f;
+  --warn: #e3ad4f;
+  --warn-soft: #2c2312;
+  --bad: #f08a80;
+  --bad-soft: #301715;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-navy: var(--navy);
+  --color-navy-2: var(--navy-2);
+  --color-navy-soft: var(--navy-soft);
+  --color-navy-text: var(--navy-text);
+  --color-gold: var(--gold);
+  --color-gold-2: var(--gold-2);
+  --color-gold-soft: var(--gold-soft);
+  --color-gold-text: var(--gold-text);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --font-sans: 'IBM Plex Sans Arabic', system-ui, 'Segoe UI', Tahoma, sans-serif;
+  --font-display: 'Amiri', 'IBM Plex Sans Arabic', serif;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+  button {
+    cursor: pointer;
+    font-family: inherit;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+@layer components {
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: 0 1px 2px rgb(20 40 75 / 0.04), 0 8px 24px -16px rgb(20 40 75 / 0.18);
+  }
+  .field {
+    width: 100%;
+    height: 52px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--ink);
+    padding: 0 16px;
+    font-size: 17px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold) 22%, transparent);
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 52px;
+    width: 100%;
+    border-radius: 14px;
+    background: linear-gradient(180deg, var(--navy-2), var(--navy));
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    box-shadow: 0 10px 24px -12px rgb(20 40 75 / 0.6);
+    transition: transform 0.1s, opacity 0.15s;
+  }
+  .dark .btn-primary {
+    background: linear-gradient(180deg, var(--gold-2), var(--gold));
+    color: #1a1407;
+  }
+  .btn-primary:active {
+    transform: scale(0.985);
+  }
+  .btn-primary:disabled {
+    opacity: 0.6;
+  }
+  .btn-soft {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 16px;
+    border-radius: 12px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .btn-soft:active {
+    background: var(--surface-2);
+  }
+
+  /* الخلفية الكحلية المزخرفة (الترويسات) */
+  .hero {
+    position: relative;
+    color: #fff;
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgb(217 184 102 / 0.22), transparent 55%),
+      radial-gradient(90% 80% at 0% 100%, rgb(60 110 190 / 0.28), transparent 60%),
+      linear-gradient(160deg, #1d3a6b 0%, #14284b 55%, #0d1b36 100%);
+    overflow: hidden;
+  }
+  .hero::before {
+    /* زخرفة هندسية خفيفة */
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.09;
+    background-image:
+      repeating-linear-gradient(45deg, #fff 0 1px, transparent 1px 22px),
+      repeating-linear-gradient(-45deg, #fff 0 1px, transparent 1px 22px);
+    mask-image: linear-gradient(180deg, #000, transparent 85%);
+    pointer-events: none;
+  }
+  .gold-rule {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold-2) 50%, var(--gold) 80%, transparent);
+  }
+  .display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.5;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ===== الحركة ===== */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes confetti {
+  0% {
+    transform: translate3d(0, -20px, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--dx), 340px, 0) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+.confetti i {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 12px;
+  border-radius: 2px;
+  animation: confetti var(--dur) cubic-bezier(0.2, 0.6, 0.4, 1) var(--delay) both;
+}
+@keyframes shine {
+  0%,
+  60% {
+    transform: translateX(120%);
+  }
+  100% {
+    transform: translateX(-120%);
+  }
+}
+.shine {
+  position: relative;
+  overflow: hidden;
+}
+.shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 35%, rgb(255 255 255 / 0.35) 50%, transparent 65%);
+  animation: shine 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+.ring-arc {
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .confetti i,
+  .shine::after,
+  .ring-arc {
+    animation: none !important;
+    transition: none !important;
+  }
+  .confetti {
+    display: none;
+  }
+}
+
+/* مساحة آمنة لهواتف الحواف المنحنية */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ===== الطباعة / حفظ PDF: تُطبع ورقة النتيجة فقط، مصغّرة لتناسب صفحة A4 واحدة ===== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+  html {
+    font-size: 11.5px;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  body {
+    font-size: 1rem;
+  }
+  .no-print,
+  .confetti {
+    display: none !important;
+  }
+  .print-root,
+  .print-root main {
+    min-height: 0 !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .rise {
+    animation: none !important;
+  }
+  .print-area {
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: 1.5px solid #14284b !important;
+    border-radius: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    --surface: #fff;
+    --surface-2: #f4f1e8;
+    --ink: #16213a;
+    --muted: #4d5568;
+    --line: #d9d2bf;
+    --navy-text: #14284b;
+    --gold-text: #7d5f1c;
+    --gold-soft: #f7efdb;
+    --navy-soft: #e8edf6;
+    --ok: #1f6b47;
+    --ok-soft: #e6f3ec;
+    --warn: #99610a;
+    --warn-soft: #fbf0d9;
+    --bad: #a3271f;
+    --bad-soft: #fbe9e7;
+    color: #16213a;
+  }
+  .print-area tr,
+  .print-area section,
+  .print-area footer {
+    break-inside: avoid;
+  }
+}
