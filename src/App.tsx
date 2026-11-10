@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState, useSyncExternalStore, type R
 import { Empty, Logo, Spinner, cx } from './components/ui'
 import { useTheme } from './lib/device'
 import { fmtDateTime, itemKey } from './lib/format'
+import { parseLoginHash } from './lib/logic'
 import { useSession } from './lib/store'
 import { Account } from './views/Account'
 import { Coursework } from './views/Coursework'
@@ -49,7 +50,31 @@ export default function App() {
     return out
   }, [records, s.seen])
 
-  if (!s.token) return <Login onSignIn={s.signIn} notice={s.notice} />
+  // مسح بطاقة دخول والتطبيق مفتوح: البطاقة نفسها ← الرئيسية، بطاقة طالب آخر ← خروج ثم دخول بها
+  const link = parseLoginHash(hash)
+  const linkLogin = link?.login
+  const currentLogin = s.data?.account.login_id
+  const { token, signOut } = s
+  useEffect(() => {
+    if (!linkLogin || !token) return
+    if (currentLogin === linkLogin) window.location.hash = '#/home'
+    else void signOut()
+  }, [linkLogin, token, currentLogin, signOut])
+
+  if (!s.token) {
+    return (
+      <Login
+        hash={hash}
+        notice={s.notice}
+        onSignIn={async (login, code) => {
+          const r = await s.signIn(login, code)
+          // بعد الدخول يبدأ الطالب دائماً من الصفحة الرئيسية
+          if (r.ok) window.location.hash = '#/home'
+          return r
+        }}
+      />
+    )
+  }
 
   if (!s.data) {
     return (

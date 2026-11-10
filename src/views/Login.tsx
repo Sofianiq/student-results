@@ -7,14 +7,13 @@ import { latinDigits } from '../lib/format'
 import { parseLoginHash } from '../lib/logic'
 import type { ApiResult } from '../lib/types'
 
-export function Login({ onSignIn, notice }: { onSignIn: (login: string, code: string) => Promise<ApiResult>; notice: string | null }) {
+export function Login({ onSignIn, notice, hash }: { onSignIn: (login: string, code: string) => Promise<ApiResult>; notice: string | null; hash: string }) {
   const [login, setLogin] = useState('')
   const [code, setCode] = useState('')
   const [show, setShow] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(notice)
   const codeRef = useRef<HTMLInputElement>(null)
-  const tried = useRef(false)
 
   const submit = async (l: string, c: string) => {
     if (busy) return
@@ -26,19 +25,18 @@ export function Login({ onSignIn, notice }: { onSignIn: (login: string, code: st
     if (!r.ok) setError(r.error)
   }
 
-  // الدخول المباشر بمسح رمز QR المطبوع على البطاقة
+  // الدخول المباشر بمسح رمز QR المطبوع على البطاقة (عند فتح التطبيق أو وهو مفتوح على صفحة الدخول)
   useEffect(() => {
-    if (tried.current) return
-    tried.current = true
-    const link = parseLoginHash(window.location.hash)
+    const link = parseLoginHash(hash)
     if (!link) return
+    // يُحذف الرمز من شريط العنوان فوراً حتى لا يبقى في سجل المتصفح
     history.replaceState(null, '', window.location.pathname + window.location.search)
     setLogin(link.login)
     setCode(link.code)
     if (link.code) void submit(link.login, link.code)
     else codeRef.current?.focus()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [hash])
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault()

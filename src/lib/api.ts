@@ -3,8 +3,12 @@ import { DEMO_ACCOUNTS, demoData } from './demo'
 import { latinDigits } from './format'
 import type { ApiResult, PortalData } from './types'
 
-const URL_ = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.replace(/\/$/, '')
-const KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
+// يقبل الرابط حتى لو نُسخ مع / أو /rest/v1 في نهايته
+const URL_ = (import.meta.env.VITE_SUPABASE_URL as string | undefined)
+  ?.trim()
+  .replace(/\/+$/, '')
+  .replace(/\/rest\/v1$/, '')
+const KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim()
 
 /** بدون ربط قاعدة البيانات يعمل التطبيق ببيانات وهمية */
 export const isDemo = !URL_ || !KEY

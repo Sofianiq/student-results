@@ -90,7 +90,7 @@ export function Home({ data, seen, go }: { data: PortalData; seen: Set<string>; 
               </Ring>
               <div className="text-xs leading-relaxed text-muted">
                 <div className="tabular font-semibold text-ink">
-                  {fmtNum(cwSum.sum)} / {cwSum.max}
+                  {fmtNum(cwSum.sum)} من {cwSum.max}
                 </div>
                 {cwSum.recorded} من {cwSum.count} مواد
               </div>
