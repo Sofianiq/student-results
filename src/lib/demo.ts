@@ -5,6 +5,7 @@ export const DEMO_ACCOUNTS = [
   { login: '1234567', code: '12345678', hint: 'طالب ناجح' },
   { login: '7654321', code: '12345678', hint: 'طالب مكمل' },
   { login: '1112223', code: '12345678', hint: 'نتيجة محجوبة' },
+  { login: '4444444', code: '12345678', hint: 'أربع مراحل' },
 ]
 
 const ok = (name: string, units: number, label: string, note = 'ناجح'): ResultRow => ({ name, units, label, note, tone: 'ok' })
@@ -153,6 +154,20 @@ const base = (login: string, records: StudentRecord[]): PortalData => ({
 })
 
 export function demoData(login: string): PortalData {
+  if (login === '4444444') {
+    // طالب في المرحلة الرابعة: يتنقل بين مراحله الأربع ويرى نتيجة كل سنة
+    const name = 'حسن فاضل عباس الجبوري'
+    const annual = (statusText: string): ResultSnapshot => ({ ...prevAnnual, statusText })
+    return base(login, [
+      record('demo0004s4', name, '2026-2027', 4, [
+        { term: 1, kind: 'coursework', published_at: days(40), data: cw1 },
+        { term: 1, kind: 'results', published_at: days(2), data: passTerm1 },
+      ]),
+      record('demo0004s3', name, '2025-2026', 3, [{ term: 0, kind: 'results', published_at: days(300), data: annual('ناجح') }]),
+      record('demo0004s2', name, '2024-2025', 2, [{ term: 0, kind: 'results', published_at: days(660), data: annual('ناجح (الدور الثاني)') }]),
+      record('demo0004s1', name, '2023-2024', 1, [{ term: 0, kind: 'results', published_at: days(1020), data: annual('ناجح') }]),
+    ])
+  }
   if (login === '1112223') {
     // نتيجة محجوبة مؤقتاً: كما يرسلها الخادم — السعي فقط، دون نتائج ولا رمز تحقق
     return base(login, [

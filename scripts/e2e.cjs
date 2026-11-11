@@ -142,6 +142,25 @@ async function main() {
   await shot('06b-withheld')
   log('withheld result: notice with the committee note, no grades, coursework still available')
 
+  // طالب في المرحلة الرابعة: كل مراحله ظاهرة في صف واحد ويتنقل بينها ليرى نتيجة كل سنة
+  await page.goto(`${BASE}#/login?u=4444444&c=12345678`)
+  await page.waitForFunction(() => document.querySelector('main')?.innerText.includes('حسن فاضل'))
+  await tab('النتائج')
+  await page.waitForSelector('article')
+  const stageTabs = page.locator('main [role=tablist][aria-label="المرحلة الدراسية"] [role=tab]')
+  assert((await stageTabs.allInnerTexts()).map((t) => t.split('\n')[0]).join('،') === 'الرابعة،الثالثة،الثانية،الأولى', 'all four stages are listed, newest first')
+  const boxes = await stageTabs.evaluateAll((els) => els.map((el) => el.getBoundingClientRect()).map((r) => [Math.round(r.top), r.left >= 0 && r.right <= window.innerWidth]))
+  assert(new Set(boxes.map((b) => b[0])).size === 1 && boxes.every((b) => b[1]), 'the four stages fit in one row without scrolling')
+  for (const [stage, year] of [['الثالثة', '2025 – 2026'], ['الثانية', '2024 – 2025'], ['الأولى', '2023 – 2024']]) {
+    await page.click(`main [role=tablist][aria-label="المرحلة الدراسية"] [role=tab]:has-text("${stage}")`)
+    await page.waitForFunction(([st, y]) => { const a = document.querySelector('article')?.innerText ?? ''; return a.includes('النتيجة السنوية') && a.includes(st) && a.includes(y) }, [stage, year])
+  }
+  await tab('حسابي')
+  await page.waitForSelector('text=السجل الأكاديمي')
+  assert((await page.locator('main li button:has-text("المرحلة")').count()) === 4, 'academic record lists the four years')
+  await shot('06c-stages')
+  log('every stage is reachable: four stage tabs in one row, each showing its own annual result')
+
   // الوضع الليلي وعدم تجاوز عرض الهاتف
   await page.click('button[aria-label="الوضع الليلي"]')
   assert(await page.evaluate(() => document.documentElement.classList.contains('dark')), 'dark mode on')
