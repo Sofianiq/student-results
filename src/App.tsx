@@ -66,6 +66,8 @@ export default function App() {
       <Login
         hash={hash}
         notice={s.notice}
+        dark={theme.dark}
+        toggleTheme={theme.toggle}
         onSignIn={async (login, code) => {
           const r = await s.signIn(login, code)
           // بعد الدخول يبدأ الطالب دائماً من الصفحة الرئيسية

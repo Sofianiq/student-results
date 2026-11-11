@@ -4,6 +4,7 @@ import type { CourseworkSnapshot, PortalData, ResultRow, ResultSnapshot, Student
 export const DEMO_ACCOUNTS = [
   { login: '1234567', code: '12345678', hint: 'طالب ناجح' },
   { login: '7654321', code: '12345678', hint: 'طالب مكمل' },
+  { login: '1112223', code: '12345678', hint: 'نتيجة محجوبة' },
 ]
 
 const ok = (name: string, units: number, label: string, note = 'ناجح'): ResultRow => ({ name, units, label, note, tone: 'ok' })
@@ -152,6 +153,17 @@ const base = (login: string, records: StudentRecord[]): PortalData => ({
 })
 
 export function demoData(login: string): PortalData {
+  if (login === '1112223') {
+    // نتيجة محجوبة مؤقتاً: كما يرسلها الخادم — السعي فقط، دون نتائج ولا رمز تحقق
+    return base(login, [
+      {
+        ...record('demo0003held', 'مصطفى أحمد سلمان العبيدي', '2026-2027', 2, [{ term: 1, kind: 'coursework', published_at: days(40), data: cw1 }]),
+        verify_code: null,
+        withheld: true,
+        withheld_note: 'يرجى مراجعة اللجنة الامتحانية.',
+      },
+    ])
+  }
   if (login === '7654321') {
     return base(login, [
       record('demo0002carry', 'زينب حيدر عبد الله جاسم', '2026-2027', 2, [

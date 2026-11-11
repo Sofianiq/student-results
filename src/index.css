@@ -339,6 +339,11 @@
   .confetti i,
   .shine::after,
   .seal-stamp,
+  .gate-lattice svg,
+  .orbit,
+  .btn-gate::after,
+  .gate-shake-a,
+  .gate-shake-b,
   .ring-arc {
     animation: none !important;
     transition: none !important;
@@ -350,6 +355,296 @@
 
 .print-only {
   display: none;
+}
+
+/* ===== صفحة الدخول «البوابة»: قوس ذهبي على سماء كحلية بزخرفة النجمة الثمانية ===== */
+.gate-page {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  overflow: hidden;
+  color: #fff;
+  background: radial-gradient(120% 80% at 50% -10%, #25498a 0%, #14284b 46%, #0a1630 100%);
+}
+.dark .gate-page {
+  background: radial-gradient(120% 80% at 50% -10%, #17305c 0%, #0c1830 50%, #060d1c 100%);
+}
+/* الزخرفة: طبقة ثابتة بقناع يخفي الأطراف، وداخلها رسم ينساب بمقدار بلاطة واحدة فيتكرر بلا قفزة */
+.gate-lattice {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  opacity: 0.17;
+  pointer-events: none;
+  mask-image: radial-gradient(95% 80% at 50% 38%, #000 25%, transparent 100%);
+}
+.gate-lattice svg {
+  position: absolute;
+  top: -96px;
+  left: -96px;
+  width: calc(100% + 192px);
+  height: calc(100% + 192px);
+  animation: lattice-drift 60s linear infinite;
+}
+@keyframes lattice-drift {
+  to {
+    transform: translate3d(96px, 96px, 0);
+  }
+}
+.gate-glow {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(64px);
+  pointer-events: none;
+}
+/* هالة ذهبية خلف قمة القوس كأن الضوء يخرج من البوابة */
+.gate-halo {
+  position: absolute;
+  z-index: -1;
+  top: -4.5rem;
+  left: 50%;
+  width: 34rem;
+  max-width: 150%;
+  height: 24rem;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgb(236 200 110 / 0.42), rgb(236 200 110 / 0.12) 55%, transparent 100%);
+  mix-blend-mode: screen;
+  filter: blur(22px);
+  pointer-events: none;
+}
+.gate-glow-b {
+  bottom: -13rem;
+  inset-inline-start: -9rem;
+  width: 27rem;
+  height: 27rem;
+  background: rgb(70 120 210 / 0.32);
+}
+.gate-theme {
+  position: absolute;
+  z-index: 2;
+  top: calc(env(safe-area-inset-top) + 0.75rem);
+  inset-inline-end: 0.9rem;
+  display: flex;
+  width: 2.6rem;
+  height: 2.6rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: rgb(255 255 255 / 0.85);
+  background: rgb(255 255 255 / 0.08);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+}
+.gate-gold-text {
+  background: linear-gradient(180deg, #f1dca0, #c9a24c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* القوس: قمة نصف دائرية وإطاران ذهبيان رفيعان */
+.gate {
+  position: relative;
+  width: 100%;
+  max-width: 26rem;
+  margin-inline: auto;
+  padding: 0 1.15rem 1.35rem;
+  color: var(--ink);
+  background: var(--bg);
+  border-radius: 13rem 13rem 1.6rem 1.6rem;
+  box-shadow:
+    0 0 0 1px rgb(217 184 102 / 0.7),
+    0 34px 80px -28px rgb(0 0 0 / 0.7);
+}
+.dark .gate {
+  background: linear-gradient(180deg, #16233f, #0f1a30);
+}
+.gate::before,
+.gate::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid rgb(217 184 102 / 0.42);
+}
+.gate::before {
+  inset: -8px;
+  border-radius: 14rem 14rem 2.05rem 2.05rem;
+}
+.gate::after {
+  inset: -15px;
+  border-color: rgb(217 184 102 / 0.17);
+  border-radius: 15rem 15rem 2.5rem 2.5rem;
+}
+.gate-dome {
+  padding: 2.1rem 1rem 0;
+  text-align: center;
+}
+.gate-threshold {
+  height: 3px;
+  margin: 1.2rem -0.2rem 0;
+  border-radius: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold-2) 50%, var(--gold) 80%, transparent);
+}
+.orbit {
+  animation: spin 70s linear infinite;
+}
+/* رقم الدخول: خانة لكل رقم كما في البطاقة المطبوعة */
+.digits {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+.digit {
+  display: flex;
+  height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 0.8rem;
+  background: var(--surface);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--navy-text);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+.digit.is-filled {
+  border-color: var(--gold);
+  background: var(--gold-soft);
+}
+.digit.is-active {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold) 24%, transparent);
+  transform: translateY(-1px);
+}
+.digit.is-caret::after {
+  content: '';
+  width: 2px;
+  height: 1.5rem;
+  border-radius: 2px;
+  background: var(--gold);
+  animation: caret 1s steps(1) infinite;
+}
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+.digits-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  font-size: 16px; /* يمنع تكبير الصفحة في iOS عند التركيز */
+  cursor: text;
+}
+.gate-code {
+  width: 100%;
+  height: 3.25rem;
+  padding: 0 3rem;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 0.8rem;
+  background: var(--surface);
+  color: var(--navy-text);
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.gate-code::placeholder {
+  color: var(--faint);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+}
+.gate-code:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold) 24%, transparent);
+}
+.btn-gate {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+  height: 3.4rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  color: #1a1407;
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: linear-gradient(180deg, #ecd28d, #b8913a);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.55),
+    0 14px 28px -14px rgb(184 145 58 / 0.9);
+  transition:
+    transform 0.1s,
+    opacity 0.15s;
+}
+.btn-gate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 35%, rgb(255 255 255 / 0.45) 50%, transparent 65%);
+  animation: shine 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+.btn-gate:active {
+  transform: scale(0.985);
+}
+.btn-gate:disabled {
+  opacity: 0.7;
+}
+.gate-demo {
+  display: flex;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0 0.9rem;
+  border-radius: 0.8rem;
+  color: #fff;
+  font-weight: 600;
+  background: rgb(255 255 255 / 0.07);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+}
+.gate-demo:active {
+  background: rgb(255 255 255 / 0.14);
+}
+/* اهتزاز خفيف عند رفض الدخول (اسمان لإعادة تشغيل الحركة مع كل محاولة) */
+@keyframes gate-shake-a {
+  20%,
+  60% {
+    transform: translateX(-7px);
+  }
+  40%,
+  80% {
+    transform: translateX(7px);
+  }
+}
+@keyframes gate-shake-b {
+  20%,
+  60% {
+    transform: translateX(-7px);
+  }
+  40%,
+  80% {
+    transform: translateX(7px);
+  }
+}
+.gate-shake-a {
+  animation: gate-shake-a 0.42s ease-in-out;
+}
+.gate-shake-b {
+  animation: gate-shake-b 0.42s ease-in-out;
 }
 
 /* مساحة آمنة لهواتف الحواف المنحنية */

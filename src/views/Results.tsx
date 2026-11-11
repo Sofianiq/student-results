@@ -1,4 +1,4 @@
-import { Award, BadgeCheck, Download, Hourglass, Medal, ShieldCheck } from 'lucide-react'
+import { Award, BadgeCheck, Download, EyeOff, Hourglass, Medal, ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { RecordPicker } from '../components/RecordPicker'
 import { Confetti, Empty, Logo, Ornament, Qr, Seal, Seg, cx, printPage } from '../components/ui'
@@ -26,6 +26,7 @@ export function Results({ data, index, onIndex, seen, markSeen }: { data: Portal
       <h1 className="display no-print mb-3 text-3xl">النتائج</h1>
       <div className="no-print">
         <RecordPicker records={data.records} index={index} onChange={onIndex} />
+        {!rec.withheld && (
         <Seg<Scope>
           className="mb-4"
           value={scope}
@@ -35,8 +36,11 @@ export function Results({ data, index, onIndex, seen, markSeen }: { data: Portal
             return { value: t, label: t === 0 ? 'السنوية' : SCOPE_LABEL[t], dot: !!it && !seen.has(itemKey(rec, it)) }
           })}
         />
+        )}
       </div>
-      {item && item.kind === 'results' ? (
+      {rec.withheld ? (
+        <Withheld note={rec.withheld_note} />
+      ) : item && item.kind === 'results' ? (
         <ResultSheet key={`${rec.student_id}|${scope}`} rec={rec} result={item.data} publishedAt={item.published_at} data={data} />
       ) : (
         <Empty icon={<Hourglass className="size-7" />} title="لم تُعلن النتيجة بعد">
@@ -44,6 +48,26 @@ export function Results({ data, index, onIndex, seen, markSeen }: { data: Portal
         </Empty>
       )}
     </div>
+  )
+}
+
+/** النتيجة محجوبة مؤقتاً بقرار من اللجنة الامتحانية: لا تصل أي نتيجة إلى الجهاز */
+export function Withheld({ note }: { note?: string | null }) {
+  return (
+    <section className="card rise overflow-hidden text-center">
+      <div className="gold-rule" />
+      <div className="px-6 py-10">
+        <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-warn-soft text-warn ring-1 ring-warn/25">
+          <EyeOff className="size-7" />
+        </div>
+        <h2 className="display text-2xl">النتيجة محجوبة مؤقتاً</h2>
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted">نتيجتك محجوبة حالياً بقرار من اللجنة الامتحانية، وستظهر هنا فور رفع الحجب.</p>
+        {note && (
+          <p className="mx-auto mt-4 max-w-sm rounded-2xl border border-gold/40 bg-gold-soft px-4 py-3 text-sm leading-relaxed whitespace-pre-line text-gold-text">{note}</p>
+        )}
+        <p className="mt-4 text-xs text-faint">السعي الفصلي المنشور ما زال متاحاً في تبويب «السعي».</p>
+      </div>
+    </section>
   )
 }
 
@@ -208,7 +232,7 @@ function ResultSheet({ rec, result, publishedAt, data }: { rec: StudentRecord; r
               <div>
                 رمز التحقق:{' '}
                 <b className="tabular inline-block whitespace-nowrap text-ink" dir="ltr">
-                  {formatCode(rec.verify_code)}
+                  {formatCode(rec.verify_code ?? '')}
                 </b>
               </div>
               <div>تاريخ الإعلان: {fmtDate(publishedAt)}</div>

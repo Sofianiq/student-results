@@ -75,6 +75,8 @@ export function Account({
                       </span>
                       <div className="mt-0.5 text-[11px] text-faint">{res.term === 0 ? 'النتيجة السنوية' : SCOPE_LABEL[res.term]}</div>
                     </div>
+                  ) : r.withheld ? (
+                    <span className="chip bg-warn-soft text-warn">محجوبة مؤقتاً</span>
                   ) : (
                     <span className="text-xs text-faint">لم تُعلن النتيجة</span>
                   )}

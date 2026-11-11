@@ -49,7 +49,12 @@ export interface StudentRecord {
   stage: number
   shift: Shift
   status: 'active' | 'withdrawn' | 'postponed'
-  verify_code: string
+  /** رمز التحقق من النتيجة (لا يُرسل عندما تكون النتيجة محجوبة) */
+  verify_code: string | null
+  /** النتيجة محجوبة مؤقتاً بقرار من اللجنة الامتحانية: لا تصل النتائج إلى الجهاز، ويبقى السعي */
+  withheld?: boolean
+  /** ملاحظة اللجنة للطالب عند الحجب */
+  withheld_note?: string | null
   items: Item[]
 }
 

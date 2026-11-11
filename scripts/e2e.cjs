@@ -30,12 +30,18 @@ async function main() {
   await page.waitForSelector('text=تسجيل الدخول')
   assert((await page.locator('header').innerText()).includes('بوابة الطالب'), 'login shows the portal name')
   assert((await page.locator('body').innerText()).includes('م.م سفيان محمد'), 'credit shown')
+  assert((await page.locator('.gate .digit').count()) === 7, 'login number is typed into seven card-like cells')
   await shot('01-login')
+  // الأرقام العربية تُقبل، وبعد الرقم السابع ينتقل المؤشر إلى الرمز السري
+  await page.locator('input[aria-label="رقم الدخول"]').focus()
+  await page.keyboard.type('١٢٣٤٥٦٧')
+  assert((await page.locator('.gate .digit.is-filled').allInnerTexts()).join('') === '1234567', 'digits shown one per cell (arabic digits accepted)')
+  assert((await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))) === 'الرمز السري', 'focus moves to the code after the seventh digit')
   await page.fill('input[aria-label="رقم الدخول"]', '1234567')
   await page.fill('input[aria-label="الرمز السري"]', '99999999')
   await page.click('button[type=submit]')
   await page.waitForSelector('text=رقم الدخول أو الرمز السري غير صحيح')
-  log('login page + wrong code message')
+  log('login gate: seven digit cells, arabic digits, auto-advance, wrong code message')
 
   await page.fill('input[aria-label="الرمز السري"]', '1234 5678')
   await page.click('button[type=submit]')
@@ -119,6 +125,22 @@ async function main() {
   assert((await page.locator('article').innerText()).includes('الفيزياء الشعاعية'), 'carried subjects listed')
   await shot('06-carry')
   log('QR sign-in switches to the scanned card; carry result lists the subjects')
+
+  // نتيجة محجوبة مؤقتاً: لا تظهر النتيجة ولا رمز التحقق، ويبقى السعي
+  await page.goto(`${BASE}#/login?u=1112223&c=12345678`)
+  await page.waitForFunction(() => document.querySelector('main')?.innerText.includes('مصطفى أحمد'))
+  assert((await page.locator('main').innerText()).includes('النتيجة محجوبة مؤقتاً'), 'home tells the student the result is withheld')
+  await tab('النتائج')
+  await page.waitForSelector('text=يرجى مراجعة اللجنة الامتحانية.')
+  const held = await page.locator('main').innerText()
+  assert(held.includes('النتيجة محجوبة مؤقتاً') && !held.includes('رمز التحقق') && !held.includes('التقدير العام'), 'withheld result shows no grades and no verification code')
+  assert((await page.locator('main article').count()) === 0 && (await page.locator('main [role=tab]').count()) === 0, 'no result sheet for a withheld result')
+  await tab('السعي')
+  await page.waitForSelector('text=مجموع السعي المرصود')
+  await tab('حسابي')
+  await page.waitForSelector('text=محجوبة مؤقتاً')
+  await shot('06b-withheld')
+  log('withheld result: notice with the committee note, no grades, coursework still available')
 
   // الوضع الليلي وعدم تجاوز عرض الهاتف
   await page.click('button[aria-label="الوضع الليلي"]')

@@ -1,4 +1,4 @@
-import { Award, BookOpenCheck, ChevronLeft, ClipboardList, KeyRound, Megaphone, Pin, Sparkles, X } from 'lucide-react'
+import { Award, BookOpenCheck, ChevronLeft, ClipboardList, EyeOff, KeyRound, Megaphone, Pin, Sparkles, X } from 'lucide-react'
 import { useState } from 'react'
 import { InstallCard } from '../components/InstallCard'
 import { Credit, Ring, cx } from '../components/ui'
@@ -50,6 +50,20 @@ export function Home({ data, seen, go }: { data: PortalData; seen: Set<string>; 
           </div>
         </div>
       </section>
+
+      {/* نتيجة محجوبة مؤقتاً */}
+      {rec.withheld && (
+        <button type="button" onClick={() => go('results')} className="card rise flex w-full items-center gap-4 p-5 text-start">
+          <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-warn-soft text-warn">
+            <EyeOff className="size-7" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="display text-xl">النتيجة محجوبة مؤقتاً</div>
+            <div className="text-sm text-muted">{rec.withheld_note || 'راجع اللجنة الامتحانية للاستفسار.'}</div>
+          </div>
+          <ChevronLeft className="size-5 shrink-0 text-faint" />
+        </button>
+      )}
 
       {/* أحدث نتيجة */}
       {result && result.kind === 'results' && msg && (
@@ -117,7 +131,7 @@ export function Home({ data, seen, go }: { data: PortalData; seen: Set<string>; 
               )}
             </div>
           ) : (
-            <div className="mt-1 text-sm text-muted">لم تُعلن بعد</div>
+            <div className="mt-1 text-sm text-muted">{rec.withheld ? 'محجوبة مؤقتاً' : 'لم تُعلن بعد'}</div>
           )}
         </button>
       </div>
