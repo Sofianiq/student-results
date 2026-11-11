@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { demoData } from './demo'
 import { formatCode, latinDigits, shortName, timeAgo } from './format'
-import { courseworkSummary, latestResult, parseLoginHash, resultMessage, verifyUrl } from './logic'
+import { courseworkSummary, gradeTally, latestResult, parseLoginHash, resultMessage, verifyUrl } from './logic'
 import type { ResultSnapshot } from './types'
 
 const result = (status: string, statusText = ''): ResultSnapshot => ({ v: 1, scope: 1, sections: [], overallLabel: null, units: 0, status, statusText, failedTitle: '', failed: [], round: 'الأول', rank: null })
@@ -50,5 +50,20 @@ describe('portal logic', () => {
     expect(JSON.stringify(d)).not.toMatch(/final_theory|cw_theory|"total"|"average"/)
     expect(latestResult(d.records[0])?.data.status).toBe('pass')
     expect(latestResult(d.records[1])?.term).toBe(0)
+  })
+
+  it('gradeTally يعدّ التقديرات من الأعلى إلى الأدنى ويتجاهل الفارغ', () => {
+    const row = (label: string) => ({ name: label + Math.random(), units: 2, label, note: 'ناجح', tone: 'ok' as const })
+    const r = {
+      sections: [
+        { term: 1, label: null, units: 6, rows: [row('جيد'), row('امتياز'), row('—')] },
+        { term: 2, label: null, units: 6, rows: [row('جيد'), row('ضعيف'), row('')] },
+      ],
+    } as unknown as ResultSnapshot
+    expect(gradeTally(r)).toEqual([
+      { label: 'امتياز', count: 1 },
+      { label: 'جيد', count: 2 },
+      { label: 'ضعيف', count: 1 },
+    ])
   })
 })

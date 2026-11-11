@@ -58,6 +58,7 @@ export function useSession(): Session {
   const [notice, setNotice] = useState<string | null>(null)
   const [seen, setSeen] = useState<Set<string>>(() => new Set(readJson<string[]>(SEEN) ?? []))
   const busy = useRef(false)
+  const lastSync = useRef(0)
 
   const store = useCallback((t: string | null, d: PortalData | null) => {
     const at = d ? new Date().toISOString() : null
@@ -77,6 +78,7 @@ export function useSession(): Session {
     try {
       const r = await api.me(t)
       if (r.ok) {
+        lastSync.current = Date.now()
         store(t, r.data)
         setOffline(false)
       } else if (r.code === 'network') {
@@ -95,7 +97,7 @@ export function useSession(): Session {
   // تحديث عند الفتح، وعند العودة للتطبيق، وعند عودة الاتصال
   useEffect(() => {
     void refresh()
-    const onVisible = () => document.visibilityState === 'visible' && void refresh()
+    const onVisible = () => document.visibilityState === 'visible' && Date.now() - lastSync.current > 30_000 && void refresh()
     const onOnline = () => void refresh()
     document.addEventListener('visibilitychange', onVisible)
     window.addEventListener('online', onOnline)

@@ -129,7 +129,7 @@ export default function App() {
         ) : tab === 'home' ? (
           <Home data={data} seen={s.seen} go={go} />
         ) : tab === 'coursework' ? (
-          <Coursework records={records} index={safeIndex} onIndex={setIndex} seen={s.seen} markSeen={s.markSeen} />
+          <Coursework data={data} index={safeIndex} onIndex={setIndex} seen={s.seen} markSeen={s.markSeen} />
         ) : tab === 'results' ? (
           <Results data={data} index={safeIndex} onIndex={setIndex} seen={s.seen} markSeen={s.markSeen} />
         ) : (

@@ -4,6 +4,18 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 
 export const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(' ')
 
+/** يفتح نافذة الطباعة/الحفظ PDF باسم ملف مفهوم (عنوان الصفحة يصبح اسم الملف) */
+export function printPage(title: string) {
+  const prev = document.title
+  document.title = title
+  const restore = () => {
+    document.title = prev
+    window.removeEventListener('afterprint', restore)
+  }
+  window.addEventListener('afterprint', restore)
+  window.print()
+}
+
 /** شعار الكلية داخل إطار ذهبي */
 export function Logo({ size = 44, className }: { size?: number; className?: string }) {
   return (
@@ -13,6 +25,20 @@ export function Logo({ size = 44, className }: { size?: number; className?: stri
     >
       <img src="./logo.png" alt="شعار الكلية" width={size - 4} height={size - 4} className="rounded-full" />
     </span>
+  )
+}
+
+/** الختم الإلكتروني «معتمد من اللجنة الامتحانية»: يُطبع بحركة ختم عند الظهور */
+export function Seal({ size = 112, animate = true, className }: { size?: number; animate?: boolean; className?: string }) {
+  return (
+    <img
+      src="./seal.png"
+      alt="ختم: معتمد من اللجنة الامتحانية"
+      width={size}
+      height={size}
+      draggable={false}
+      className={cx('seal shrink-0', animate && 'seal-stamp', className)}
+    />
   )
 }
 

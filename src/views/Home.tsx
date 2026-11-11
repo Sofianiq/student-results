@@ -9,6 +9,9 @@ import type { Tab } from '../App'
 
 const HIDE_CODE_TIP = 'portal.tip.code'
 
+/** تحية حسب وقت اليوم */
+const greeting = (h = new Date().getHours()) => (h >= 4 && h < 12 ? 'صباح الخير' : h >= 12 && h < 17 ? 'أهلاً بك' : 'مساء الخير')
+
 export function Home({ data, seen, go }: { data: PortalData; seen: Set<string>; go: (t: Tab) => void }) {
   const rec = data.records[0]
   const result = latestResult(rec)
@@ -37,7 +40,7 @@ export function Home({ data, seen, go }: { data: PortalData; seen: Set<string>; 
       {/* التحية */}
       <section className="hero rise rounded-3xl p-5">
         <div className="relative">
-          <div className="text-sm text-white/75">أهلاً بك،</div>
+          <div className="text-sm text-white/75">{greeting()}،</div>
           <h1 className="display text-3xl">{shortName(rec.full_name)}</h1>
           <div className="mt-3 flex flex-wrap gap-1.5">
             <span className="chip bg-white/12 text-white ring-1 ring-white/20">{rec.department}</span>

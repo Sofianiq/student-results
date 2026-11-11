@@ -52,6 +52,24 @@ export function resultMessage(r: ResultSnapshot): ResultMessage {
   }
 }
 
+const GRADE_ORDER = ['امتياز', 'جيد جداً', 'جيد', 'متوسط', 'مقبول', 'ضعيف']
+
+/** عدد المواد لكل تقدير (من الأعلى إلى الأدنى) لعرض ملخص سريع أسفل النتيجة */
+export function gradeTally(r: ResultSnapshot): { label: string; count: number }[] {
+  const counts = new Map<string, number>()
+  for (const sec of r.sections)
+    for (const row of sec.rows) {
+      const label = row.label?.trim()
+      if (!label || /^[—–-]+$/.test(label)) continue
+      counts.set(label, (counts.get(label) ?? 0) + 1)
+    }
+  const rank = (l: string) => {
+    const i = GRADE_ORDER.indexOf(l)
+    return i < 0 ? GRADE_ORDER.length : i
+  }
+  return [...counts].map(([label, count]) => ({ label, count })).sort((a, b) => rank(a.label) - rank(b.label))
+}
+
 export const isPassing = (status: string) => status === 'pass' || status === 'pass_r2' || status === 'pass_carry'
 
 /** رابط صفحة التحقق العامة في نظام اللجنة (يُشفَّر في رمز QR على النتيجة) */

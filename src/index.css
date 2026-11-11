@@ -6,7 +6,6 @@
 @import '@fontsource/ibm-plex-sans-arabic/latin-400.css';
 @import '@fontsource/ibm-plex-sans-arabic/latin-600.css';
 @import '@fontsource/ibm-plex-sans-arabic/latin-700.css';
-@import '@fontsource/amiri/arabic-400.css';
 @import '@fontsource/amiri/arabic-700.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -302,6 +301,36 @@
 .spin {
   animation: spin 0.9s linear infinite;
 }
+/* الختم الإلكتروني: مائل قليلاً كالختم الحقيقي، ويُطبع بحركة عند ظهوره */
+.seal {
+  transform: rotate(-9deg);
+  opacity: 0.93;
+  user-select: none;
+  pointer-events: none;
+}
+.dark .seal {
+  filter: brightness(2.15) saturate(0.62);
+}
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: rotate(-24deg) scale(2.2);
+  }
+  55% {
+    opacity: 1;
+    transform: rotate(-9deg) scale(0.92);
+  }
+  78% {
+    transform: rotate(-9deg) scale(1.04);
+  }
+  100% {
+    opacity: 0.93;
+    transform: rotate(-9deg) scale(1);
+  }
+}
+.seal-stamp {
+  animation: stamp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.55s both;
+}
 .ring-arc {
   transition: stroke-dashoffset 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
@@ -309,6 +338,7 @@
   .rise,
   .confetti i,
   .shine::after,
+  .seal-stamp,
   .ring-arc {
     animation: none !important;
     transition: none !important;
@@ -316,6 +346,10 @@
   .confetti {
     display: none;
   }
+}
+
+.print-only {
+  display: none;
 }
 
 /* مساحة آمنة لهواتف الحواف المنحنية */
@@ -333,7 +367,7 @@
     margin: 12mm;
   }
   html {
-    font-size: 11.5px;
+    font-size: var(--print-fs, 11px);
   }
   html,
   body {
@@ -353,8 +387,45 @@
     padding: 0 !important;
     margin: 0 !important;
   }
-  .rise {
+  .rise,
+  .seal-stamp {
     animation: none !important;
+  }
+  .seal {
+    filter: none !important;
+    opacity: 0.95;
+  }
+  .print-only {
+    display: block !important;
+  }
+  /* ضغط المسافات في الطباعة لتبقى النتيجة في صفحة واحدة */
+  .print-area > header {
+    padding-top: 0.8rem !important;
+    padding-bottom: 0.6rem !important;
+  }
+  .print-area .print-tight {
+    padding-top: 0.7rem !important;
+    padding-bottom: 0.7rem !important;
+  }
+  .print-area th,
+  .print-area td {
+    padding-top: 0.34rem !important;
+    padding-bottom: 0.34rem !important;
+  }
+  .print-area .print-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    column-gap: 0.75rem;
+    padding: 0 1rem;
+  }
+  .print-area .print-cols > section {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .print-area .seal {
+    width: 100px;
+    height: 100px;
   }
   .print-area {
     margin: 0 !important;

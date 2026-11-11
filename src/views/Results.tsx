@@ -1,9 +1,9 @@
 import { Award, BadgeCheck, Download, Hourglass, Medal, ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { RecordPicker } from '../components/RecordPicker'
-import { Confetti, Empty, Logo, Ornament, Qr, Seg, cx } from '../components/ui'
+import { Confetti, Empty, Logo, Ornament, Qr, Seal, Seg, cx, printPage } from '../components/ui'
 import { SCOPE_LABEL, SHIFT_LABEL, fmtDate, formatCode, itemKey, stageLabel, yearLabel } from '../lib/format'
-import { resultMessage, verifyUrl, type Mood } from '../lib/logic'
+import { gradeTally, resultMessage, verifyUrl, type Mood } from '../lib/logic'
 import type { PortalData, ResultSnapshot, Scope, StudentRecord, Tone } from '../lib/types'
 
 export function Results({ data, index, onIndex, seen, markSeen }: { data: PortalData; index: number; onIndex: (i: number) => void; seen: Set<string>; markSeen: (k: string[]) => void }) {
@@ -62,6 +62,18 @@ function ResultSheet({ rec, result, publishedAt, data }: { rec: StudentRecord; r
   const link = verifyUrl(data.exam_url, rec.verify_code)
   const inactive = rec.status !== 'active'
   const festive = msg.mood === 'celebrate' || msg.mood === 'pass'
+  const tally = gradeTally(result)
+
+  // حجم خط الطباعة يتكيف مع طول النتيجة حتى تبقى في صفحة A4 واحدة
+  // (النتيجة السنوية تُطبع بعمودين: فصل في كل عمود)
+  const twoCols = result.sections.length > 1
+  const longest = Math.max(0, ...result.sections.map((sec) => sec.rows.length))
+  const lines = (twoCols ? Math.ceil(longest * 1.25) : longest) + 2 + result.failed.length
+  useEffect(() => {
+    const fs = lines <= 13 ? 10.5 : lines <= 16 ? 9.5 : lines <= 19 ? 8.5 : 8
+    document.documentElement.style.setProperty('--print-fs', `${fs}px`)
+    return () => void document.documentElement.style.removeProperty('--print-fs')
+  }, [lines])
 
   return (
     <div className="space-y-3">
@@ -78,8 +90,8 @@ function ResultSheet({ rec, result, publishedAt, data }: { rec: StudentRecord; r
         <div className="gold-rule" />
 
         {/* بيانات الطالب */}
-        <dl className="grid grid-cols-2 gap-x-4 gap-y-2 px-5 py-4 text-sm">
-          <div className="col-span-2">
+        <dl className="print-tight grid grid-cols-2 gap-x-4 gap-y-2 px-5 py-4 text-sm sm:grid-cols-3">
+          <div className="col-span-2 sm:col-span-3">
             <dt className="text-xs text-muted">اسم الطالب</dt>
             <dd className="text-lg font-bold text-navy-text">{rec.full_name}</dd>
           </div>
@@ -92,11 +104,11 @@ function ResultSheet({ rec, result, publishedAt, data }: { rec: StudentRecord; r
         </dl>
 
         {/* الحالة النهائية */}
-        <section className={cx('relative mx-4 overflow-hidden rounded-2xl px-5 py-6 text-center', MOOD[msg.mood].wrap)}>
+        <section className={cx('print-tight relative mx-4 overflow-hidden rounded-2xl px-5 py-6 text-center', MOOD[msg.mood].wrap)}>
           {msg.mood === 'celebrate' && <Confetti />}
           <div className="relative">
             {festive && (
-              <div className="mx-auto mb-2 flex size-14 items-center justify-center rounded-full bg-white/10 text-gold-2 ring-1 ring-gold-2/50">
+              <div className="no-print mx-auto mb-2 flex size-14 items-center justify-center rounded-full bg-white/10 text-gold-2 ring-1 ring-gold-2/50">
                 <Award className="size-8" />
               </div>
             )}
@@ -126,6 +138,7 @@ function ResultSheet({ rec, result, publishedAt, data }: { rec: StudentRecord; r
         </section>
 
         {/* المواد */}
+        <div className={cx(twoCols && 'print-cols')}>
         {result.sections.map((sec) => (
           <section key={sec.term} className="px-4 pt-4">
             <div className="mb-2 flex items-center justify-between gap-2 px-1">
@@ -162,6 +175,7 @@ function ResultSheet({ rec, result, publishedAt, data }: { rec: StudentRecord; r
             </div>
           </section>
         ))}
+        </div>
 
         {/* الخلاصة */}
         <div className="grid grid-cols-2 gap-3 px-4 pt-4">
@@ -169,27 +183,55 @@ function ResultSheet({ rec, result, publishedAt, data }: { rec: StudentRecord; r
           <Summary label="مجموع الوحدات" value={String(result.units)} />
         </div>
 
+        {/* توزيع التقديرات */}
+        {tally.length > 1 && (
+          <div className="mx-4 mt-3 flex flex-wrap items-center justify-center gap-1.5 rounded-2xl border border-line px-3 py-2.5">
+            <span className="text-xs text-muted">تقديراتك:</span>
+            {tally.map((t) => (
+              <span key={t.label} className="chip bg-navy-soft text-navy-text">
+                {t.label} <b className="tabular rounded-full bg-surface px-1.5 text-[11px]">{t.count}</b>
+              </span>
+            ))}
+          </div>
+        )}
+
         <Ornament className="pt-5" />
 
-        {/* التحقق */}
-        <footer className="flex items-center gap-4 px-5 pt-3 pb-5">
-          {link && <Qr value={link} size={84} />}
-          <div className="min-w-0 flex-1 text-xs leading-relaxed text-muted">
-            <div className="flex items-center gap-1.5 font-bold text-ok">
-              <ShieldCheck className="size-4" /> نتيجة موثقة من اللجنة الامتحانية
+        {/* الاعتماد: ختم اللجنة الامتحانية ورمز التحقق */}
+        <footer className="px-5 pt-2 pb-5">
+          <div className="flex items-center gap-4">
+            <Seal size={118} className="-ms-1" />
+            <div className="min-w-0 flex-1 text-xs leading-relaxed text-muted">
+              <div className="flex items-center gap-1.5 text-sm font-bold text-ok">
+                <ShieldCheck className="size-4 shrink-0" /> نتيجة معتمدة من اللجنة الامتحانية
+              </div>
+              <div>
+                رمز التحقق:{' '}
+                <b className="tabular inline-block whitespace-nowrap text-ink" dir="ltr">
+                  {formatCode(rec.verify_code)}
+                </b>
+              </div>
+              <div>تاريخ الإعلان: {fmtDate(publishedAt)}</div>
             </div>
-            {link && <div>امسح الرمز للتحقق من صحة النتيجة.</div>}
-            <div>
-              رمز التحقق: <b className="tabular text-ink" dir="ltr">{formatCode(rec.verify_code)}</b>
-            </div>
-            <div>تاريخ الإعلان: {fmtDate(publishedAt)}</div>
-            <div className="mt-1 text-[11px] text-faint">نسخة إلكترونية للاطلاع؛ الوثيقة الرسمية تصدر من اللجنة الامتحانية.</div>
+            {link && (
+              <div className="hidden shrink-0 flex-col items-center gap-1 sm:flex">
+                <Qr value={link} size={84} />
+                <span className="text-[10px] text-muted">امسح للتحقق</span>
+              </div>
+            )}
           </div>
+          {link && (
+            <div className="mt-3 flex items-center gap-3 rounded-2xl border border-line bg-surface-2 p-2.5 text-xs leading-relaxed text-muted sm:hidden">
+              <Qr value={link} size={64} />
+              <span>امسح الرمز للتحقق من صحة النتيجة من موقع اللجنة الامتحانية مباشرة.</span>
+            </div>
+          )}
+          <p className="mt-3 text-center text-[11px] text-faint">نسخة إلكترونية للاطلاع؛ الوثيقة الرسمية تصدر من اللجنة الامتحانية.</p>
         </footer>
       </article>
 
       <div className="no-print flex gap-2">
-        <button type="button" className="btn-soft flex-1" onClick={() => window.print()}>
+        <button type="button" className="btn-soft flex-1" onClick={() => printPage(`نتيجة ${SCOPE_LABEL[result.scope]} — ${rec.full_name}`)}>
           <Download className="size-4" /> حفظ النتيجة PDF
         </button>
         {link && (

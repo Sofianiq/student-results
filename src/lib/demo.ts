@@ -124,7 +124,7 @@ const base = (login: string, records: StudentRecord[]): PortalData => ({
   account: { login_id: login, code_changed: false },
   college: { university_name: 'جامعة السراج الأهلية', college_name: 'كلية التقنيات الصحية والطبية' },
   notice: 'تُعلن نتائج الفصل الثاني بعد اعتمادها من مجلس الكلية بإذن الله.',
-  exam_url: null,
+  exam_url: 'https://sofianiq.github.io/Exam/',
   records,
   announcements: [
     {
